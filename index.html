@@ -4,6 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Learning Language by Yourself</title>
+  
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-F524GT2EQV"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-F524GT2EQV');
+  </script>
+
   <style>
     * {
       box-sizing: border-box;
@@ -453,6 +463,10 @@ function setupAds() {
   leftBannerImg.src = AD_CONFIG.leftBanner.image;
   leftBanner.addEventListener('click', () => {
     window.open(AD_CONFIG.leftBanner.link, '_blank');
+    gtag('event', 'click', {
+      'event_category': 'ad',
+      'event_label': 'left_banner'
+    });
   });
 
   // Thiết lập banner phải
@@ -461,6 +475,10 @@ function setupAds() {
   rightBannerImg.src = AD_CONFIG.rightBanner.image;
   rightBanner.addEventListener('click', () => {
     window.open(AD_CONFIG.rightBanner.link, '_blank');
+    gtag('event', 'click', {
+      'event_category': 'ad',
+      'event_label': 'right_banner'
+    });
   });
 
   // Thiết lập quảng cáo full màn hình
@@ -471,6 +489,10 @@ function setupAds() {
   adContainer.addEventListener('click', (e) => {
     if (e.target.id !== 'ad-close') {
       window.open(AD_CONFIG.fullscreenAd.link, '_blank');
+      gtag('event', 'click', {
+        'event_category': 'ad',
+        'event_label': 'fullscreen_ad'
+      });
     }
   });
 
@@ -483,6 +505,12 @@ function setupAds() {
 function showFullscreenAd() {
   const fullscreenAd = document.getElementById('fullscreen-ad');
   fullscreenAd.style.display = 'flex';
+  
+  // Gửi sự kiện Google Analytics
+  gtag('event', 'view', {
+    'event_category': 'ad',
+    'event_label': 'fullscreen_ad'
+  });
   
   let countdown = 30;
   const countdownElement = document.getElementById('countdown');
@@ -563,16 +591,28 @@ let userQuestionsIndex = 0;
 btnToInput.addEventListener('click', () => { 
   startScreen.style.display = 'none'; 
   inputScreen.style.display = 'flex'; 
+  gtag('event', 'click', {
+    'event_category': 'navigation',
+    'event_label': 'start_button'
+  });
 });
 
 document.getElementById('btn-back').addEventListener('click', () => { 
   inputScreen.style.display = 'none'; 
   startScreen.style.display = 'flex'; 
+  gtag('event', 'click', {
+    'event_category': 'navigation',
+    'event_label': 'back_button'
+  });
 });
 
 document.getElementById('btn-clear').addEventListener('click', () => { 
   document.getElementById('obstacles').value = ''; 
   document.getElementById('answers').value = ''; 
+  gtag('event', 'click', {
+    'event_category': 'input',
+    'event_label': 'clear_button'
+  });
 });
 
 btnConfirm.addEventListener('click', () => {
@@ -580,12 +620,24 @@ btnConfirm.addEventListener('click', () => {
   const answers = document.getElementById('answers').value.trim().split('\n').filter(line => line);
   if (obstacles.length === 0 || obstacles.length !== answers.length) {
       alert('Dữ liệu không hợp lệ. Vui lòng kiểm tra lại!'); 
+      gtag('event', 'error', {
+        'event_category': 'input',
+        'event_label': 'invalid_data'
+      });
       return;
   }
   userQuestions = obstacles.map((q, i) => ({ question: q, answer: answers[i] }));
   inputScreen.style.display = 'none';
   startScreen.style.display = 'none';
   gameWrapper.style.display = 'flex';
+  
+  // Gửi sự kiện Google Analytics
+  gtag('event', 'start_game', {
+    'event_category': 'game',
+    'event_label': 'game_started',
+    'value': obstacles.length
+  });
+  
   resize();
   startGame();
 });
@@ -594,11 +646,19 @@ btnBackToInput.addEventListener('click', () => {
   gameOverScreen.style.display = 'none';
   gameWrapper.style.display = 'none';
   inputScreen.style.display = 'flex';
+  gtag('event', 'click', {
+    'event_category': 'navigation',
+    'event_label': 'back_to_input'
+  });
 });
 
 // Nút bàn phím ảo cho mobile
 virtualKeyboardBtn.addEventListener('click', () => {
   inputBox.focus();
+  gtag('event', 'click', {
+    'event_category': 'input',
+    'event_label': 'virtual_keyboard'
+  });
 });
 
 // =======================================================
@@ -666,6 +726,14 @@ function showVictoryAndStartNextLevel() {
     gameRunning = false;
     setPenguinState('fun');
     victoryScreen.style.display = 'flex';
+    
+    // Gửi sự kiện Google Analytics
+    gtag('event', 'level_complete', {
+      'event_category': 'game',
+      'event_label': 'level_completed',
+      'value': currentLevel
+    });
+    
     setTimeout(() => {
         victoryScreen.style.display = 'none';
         startLevel(currentLevel + 1);
@@ -757,6 +825,13 @@ function gameOver() {
   finalScoreElement.textContent = `Bạn qua được Màn ${currentLevel-1}. Tổng điểm: ${score}`;
   gameOverScreen.style.display = 'flex';
   
+  // Gửi sự kiện Google Analytics
+  gtag('event', 'game_over', {
+    'event_category': 'game',
+    'event_label': 'game_ended',
+    'value': score
+  });
+  
   // Hiển thị quảng cáo full màn hình khi game over
   setTimeout(showFullscreenAd, 1000);
 }
@@ -779,18 +854,39 @@ inputBox.addEventListener('keydown', (e) => {
         wordsClearedThisLevel++;
         correctGuess = true;
         
+        // Gửi sự kiện Google Analytics
+        gtag('event', 'correct_answer', {
+          'event_category': 'game',
+          'event_label': 'answer_correct',
+          'value': score
+        });
+        
         if (wordsClearedThisLevel >= levelObjective) {
             showVictoryAndStartNextLevel();
         }
         break;
       }
     }
-    if (!correctGuess) setPenguinState('ping');
+    if (!correctGuess) {
+      setPenguinState('ping');
+      // Gửi sự kiện Google Analytics
+      gtag('event', 'wrong_answer', {
+        'event_category': 'game',
+        'event_label': 'answer_wrong'
+      });
+    }
     inputBox.value = '';
   }
 });
 
-playAgainButton.addEventListener('click', startGame);
+playAgainButton.addEventListener('click', () => {
+  gtag('event', 'click', {
+    'event_category': 'game',
+    'event_label': 'play_again'
+  });
+  startGame();
+});
+
 window.addEventListener('click', () => { 
   if (gameRunning) inputBox.focus(); 
 });
@@ -811,6 +907,12 @@ if (window.innerWidth > 768) {
 window.addEventListener('load', function() {
   resize();
   setupAds();
+  
+  // Gửi sự kiện Google Analytics
+  gtag('event', 'page_view', {
+    'page_title': 'Learning Language Game',
+    'page_location': window.location.href
+  });
 });
 </script>
 </body>
